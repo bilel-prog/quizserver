@@ -56,15 +56,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow specific origins
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:4200",
-            "https://aesthetic-bublanina-f81e8c.netlify.app",
-            "https://quizserver-t0oo.onrender.com"
-        ));
-        // Also allow origin patterns for wildcards
+        // Use allowedOriginPatterns instead of allowedOrigins when allowCredentials is true
         configuration.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:*",
+            "https://aesthetic-bublanina-f81e8c.netlify.app",
+            "https://quizserver-t0oo.onrender.com",
             "https://*.netlify.app",
             "https://*.onrender.com",
             "https://*.vercel.app"
