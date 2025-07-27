@@ -39,6 +39,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/ping").permitAll()         // Allow ping endpoint
                 .requestMatchers("/actuator/health").permitAll()  // Allow health checks for Render
                 .requestMatchers("/api/health/**").permitAll()  // Allow health endpoints
                 .requestMatchers("/api/admin/**").permitAll()   // Temporarily allow admin endpoints for testing

@@ -48,8 +48,13 @@ public class UserController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         try {
+            // Create a simple User object from the request
+            User user = new User();
+            user.setEmail(loginRequest.get("email"));
+            user.setPassword(loginRequest.get("password"));
+            
             Map<String, Object> loginResponse = userService.login(user);
             if (loginResponse == null) {
                 return new ResponseEntity<>("Wrong credentials", HttpStatus.NOT_ACCEPTABLE);
@@ -59,6 +64,7 @@ public class UserController {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Internal server error");
             errorResponse.put("message", e.getMessage());
+            errorResponse.put("stackTrace", java.util.Arrays.toString(e.getStackTrace()));
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
