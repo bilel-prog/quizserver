@@ -39,6 +39,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()  // Allow health checks for Render
                 .requestMatchers("/api/health/**").permitAll()  // Allow health endpoints
                 .requestMatchers("/api/admin/**").permitAll()   // Temporarily allow admin endpoints for testing
                 .requestMatchers("/api/user/**").permitAll()    // Temporarily allow user endpoints for testing
@@ -51,7 +52,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // Allow your frontend domains
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:4200",
+            "https://*.onrender.com",
+            "https://*.netlify.app",
+            "https://*.vercel.app"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
