@@ -43,8 +43,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/health/**").permitAll()  // Allow health endpoints
                 .requestMatchers("/api/admin/**").permitAll()   // Temporarily allow admin endpoints for testing
                 .requestMatchers("/api/user/**").permitAll()    // Temporarily allow user endpoints for testing
+                .requestMatchers("/error").permitAll()          // Allow error page
                 .anyRequest().authenticated()
-            );
+            )
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(form -> form.disable());
 
         return http.build();
     }

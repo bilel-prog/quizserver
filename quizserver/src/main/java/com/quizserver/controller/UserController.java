@@ -10,12 +10,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin("*")
 public class UserController {
     
     @Autowired
     private UserService userService;
+    
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        return new ResponseEntity<>("Auth controller is working!", HttpStatus.OK);
+    }
     
     @PostMapping("/sign-up")
     public ResponseEntity<?> signupUser(@RequestBody User user) {
