@@ -1,0 +1,38 @@
+# Maven
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Docker
+Dockerfile
+Dockerfile.*
+.dockerignore
+
+# Node.js (for frontend)
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Logs
+*.log
+**/*.log
+
+# Environment
+.env
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Temporary files
+*.tmp
+*.bak
