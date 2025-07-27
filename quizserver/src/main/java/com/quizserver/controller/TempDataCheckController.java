@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/temp")
-@CrossOrigin("*")
 public class TempDataCheckController {
 
     @Autowired

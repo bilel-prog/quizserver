@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/test")
-@CrossOrigin("*")
 public class TestController {
     @Autowired
     private TestService testService;
