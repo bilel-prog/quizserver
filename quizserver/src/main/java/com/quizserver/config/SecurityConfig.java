@@ -52,16 +52,32 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow your frontend domains
-        configuration.setAllowedOriginPatterns(Arrays.asList(
+        // Allow specific origins
+        configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://*.onrender.com",
+            "https://aesthetic-bublanina-f81e8c.netlify.app",
+            "https://quizserver-t0oo.onrender.com"
+        ));
+        // Also allow origin patterns for wildcards
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:*",
             "https://*.netlify.app",
+            "https://*.onrender.com",
             "https://*.vercel.app"
         ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Accept",
+            "Accept-Language",
+            "Content-Language",
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+            "Cache-Control"
+        ));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
