@@ -7,17 +7,31 @@ WORKDIR /build
 # Copy everything
 COPY . .
 
-# Navigate to the Spring Boot project directory and build
-WORKDIR /build/quizserver/quizserver
-RUN mvn clean package -DskipTests
+# Debug: List the structure
+RUN echo "=== Repository structure ===" && \
+    ls -la && \
+    find . -name "pom.xml" -type f
+
+# Build the application
+RUN if [ -f "pom.xml" ]; then \
+        echo "Building from root directory" && \
+        mvn clean package -DskipTests; \
+    elif [ -f "quizserver/pom.xml" ]; then \
+        echo "Building from quizserver subdirectory" && \
+        cd quizserver && \
+        mvn clean package -DskipTests; \
+    else \
+        echo "ERROR: No pom.xml found!" && \
+        exit 1; \
+    fi
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Copy jar from build stage
-COPY --from=build /build/quizserver/quizserver/target/quizserver-0.0.1-SNAPSHOT.jar app.jar
+# First try to copy from root target directory
+COPY --from=build /build/target/quizserver-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose port
 EXPOSE 8080
