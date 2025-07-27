@@ -30,8 +30,8 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# First try to copy from root target directory
-COPY --from=build /build/target/quizserver-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy JAR file from the quizserver subdirectory target folder
+COPY --from=build /build/quizserver/target/quizserver-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose port
 EXPOSE 8080
