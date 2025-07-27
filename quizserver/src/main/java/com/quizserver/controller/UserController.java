@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,27 +21,45 @@ public class UserController {
     
     @GetMapping("/test")
     public ResponseEntity<?> test() {
-        return new ResponseEntity<>("Auth controller is working!", HttpStatus.OK);
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Auth controller is working!");
+        response.put("timestamp", new Date().toString());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     @PostMapping("/sign-up")
     public ResponseEntity<?> signupUser(@RequestBody User user) {
-        if (userService.hasUserWithEmail(user.getEmail())) {
-            return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
+        try {
+            if (userService.hasUserWithEmail(user.getEmail())) {
+                return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
+            }
+            User createUser = userService.createUser(user);
+            if (createUser == null) {
+                return new ResponseEntity<>("User not created, come again later", HttpStatus.NOT_ACCEPTABLE);
+            }
+            return new ResponseEntity<>(createUser, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Internal server error");
+            errorResponse.put("message", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        User createUser = userService.createUser(user);
-        if (createUser == null) {
-            return new ResponseEntity<>("User not created, come again later", HttpStatus.NOT_ACCEPTABLE);
-        }
-        return new ResponseEntity<>(createUser, HttpStatus.OK);
     }
     
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        Map<String, Object> loginResponse = userService.login(user);
-        if (loginResponse == null) {
-            return new ResponseEntity<>("Wrong credentials", HttpStatus.NOT_ACCEPTABLE);
+        try {
+            Map<String, Object> loginResponse = userService.login(user);
+            if (loginResponse == null) {
+                return new ResponseEntity<>("Wrong credentials", HttpStatus.NOT_ACCEPTABLE);
+            }
+            return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Internal server error");
+            errorResponse.put("message", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 }
