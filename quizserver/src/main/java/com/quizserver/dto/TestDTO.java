@@ -9,6 +9,7 @@ public class TestDTO {
     private Long time;
     private Long timePerQuestion;
     private List<QuestionDTO> questions;
+    private Integer questionCount; // Add this field for caching the count
 
     // Getters
     public Long getId() {
@@ -59,6 +60,19 @@ public class TestDTO {
 
     public void setTimePerQuestion(Long timePerQuestion) {
         this.timePerQuestion = timePerQuestion;
+    }
+
+    // Computed property for question count
+    public int getQuestionCount() {
+        // If questionCount is cached, use it; otherwise count from questions list
+        if (questionCount != null) {
+            return questionCount;
+        }
+        return questions != null ? questions.size() : 0;
+    }
+
+    public void setQuestionCount(Integer questionCount) {
+        this.questionCount = questionCount;
     }
 
 }

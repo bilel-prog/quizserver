@@ -19,6 +19,70 @@ import java.util.stream.Collectors;
 
 @Service
 public class TestServiceImpl implements TestService {
+    @Override
+    public PageDTO<TestDTO> getAllTestsPaged(int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Test> pageResult = testRepository.findAll(pageable);
+        List<TestDTO> content = pageResult.getContent().stream()
+                .map(test -> {
+                    TestDTO dto = test.getDto();
+                    // Manually set the question count for performance
+                    long questionCount = questionRepository.countByTestId(test.getId());
+                    dto.setQuestionCount((int) questionCount);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        
+        return new PageDTO<>(
+            content,
+            pageResult.getTotalPages(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.isFirst(),
+            pageResult.isLast()
+        );
+    }
+
+    @Override
+    public PageDTO<QuestionDTO> getQuestionsByTestPaged(Long testId, int page, int size) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new EntityNotFoundException("Test not found with ID " + testId));
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Question> pageResult = questionRepository.findByTest(test, pageable);
+        List<QuestionDTO> content = pageResult.getContent().stream()
+                .map(Question::getDto)
+                .collect(Collectors.toList());
+        
+        return new PageDTO<>(
+            content,
+            pageResult.getTotalPages(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.isFirst(),
+            pageResult.isLast()
+        );
+    }
+
+    @Override
+    public PageDTO<TestResultDTO> getUserResultsPaged(Long userId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<TestResult> pageResult = testResultRepository.findAllByUserId(userId, pageable);
+        List<TestResultDTO> content = pageResult.getContent().stream()
+                .map(TestResult::getDTO)
+                .collect(Collectors.toList());
+        
+        return new PageDTO<>(
+            content,
+            pageResult.getTotalPages(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.isFirst(),
+            pageResult.isLast()
+        );
+    }
 
     @Autowired
     private TestRepository testRepository;
@@ -77,7 +141,13 @@ public class TestServiceImpl implements TestService {
     }
     public List<TestDTO> getAllTests() {
         return testRepository.findAll().stream()
-                .map(Test::getDto)
+                .map(test -> {
+                    TestDTO dto = test.getDto();
+                    // Set the question count for each test
+                    long questionCount = questionRepository.countByTestId(test.getId());
+                    dto.setQuestionCount((int) questionCount);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -114,6 +184,25 @@ public class TestServiceImpl implements TestService {
     
     public List<TestResultDTO> getAllTestResults() {
         return testResultRepository.findAll().stream().map(TestResult::getDTO).collect(Collectors.toList());
+    }
+    
+    @Override
+    public PageDTO<TestResultDTO> getAllTestResultsPaged(int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<TestResult> pageResult = testResultRepository.findAll(pageable);
+        List<TestResultDTO> content = pageResult.getContent().stream()
+                .map(TestResult::getDTO)
+                .collect(Collectors.toList());
+        
+        return new PageDTO<>(
+            content,
+            pageResult.getTotalPages(),
+            pageResult.getTotalElements(),
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.isFirst(),
+            pageResult.isLast()
+        );
     }
 
     public List<TestResultDTO> getAllResultsOfUser(Long userId) {

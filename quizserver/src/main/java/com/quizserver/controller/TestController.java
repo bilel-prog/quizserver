@@ -37,6 +37,16 @@ public class TestController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    
+    @GetMapping("/paged")
+    public ResponseEntity<?> getAllTestsPaged(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size) {
+        try {
+            return new ResponseEntity<>(testService.getAllTestsPaged(page, size), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
     @GetMapping("/{id}")
     public ResponseEntity<?> getAllQuestions(@PathVariable Long id) {
         try {

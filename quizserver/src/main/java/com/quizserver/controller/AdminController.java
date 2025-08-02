@@ -42,6 +42,16 @@ public class AdminController {
         }
     }
     
+    @GetMapping("/tests/paged")
+    public ResponseEntity<?> getAllTestsPaged(@RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size) {
+        try {
+            return new ResponseEntity<>(testService.getAllTestsPaged(page, size), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    
     @GetMapping("/test/{id}")
     public ResponseEntity<?> getTestById(@PathVariable Long id) {
         try {
@@ -55,6 +65,17 @@ public class AdminController {
     public ResponseEntity<?> getTestQuestions(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(testService.getAllQuestionsByTest(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    @GetMapping("/test/{id}/questions/paged")
+    public ResponseEntity<?> getTestQuestionsPaged(@PathVariable Long id,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size) {
+        try {
+            return new ResponseEntity<>(testService.getQuestionsByTestPaged(id, page, size), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -94,6 +115,16 @@ public class AdminController {
     public ResponseEntity<?> getAllTestResults() {
         try {
             return new ResponseEntity<>(testService.getAllTestResults(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    @GetMapping("/test-results/paged")
+    public ResponseEntity<?> getAllTestResultsPaged(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
+        try {
+            return new ResponseEntity<>(testService.getAllTestResultsPaged(page, size), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

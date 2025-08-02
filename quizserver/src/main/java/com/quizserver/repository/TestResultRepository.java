@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface TestResultRepository extends JpaRepository<TestResult,Long> {
-    List<TestResult>findAllByUserId(Long userId);
+    List<TestResult> findAllByUserId(Long userId);
+    org.springframework.data.domain.Page<TestResult> findAllByUserId(Long userId, org.springframework.data.domain.Pageable pageable);
 }

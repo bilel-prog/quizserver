@@ -58,6 +58,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Use allowedOriginPatterns instead of allowedOrigins when allowCredentials is true
         configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:4200",
             "http://localhost:*",
             "https://aesthetic-bublanina-f81e8c.netlify.app",
             "https://quizserver-t0oo.onrender.com",
