@@ -33,8 +33,12 @@ WORKDIR /app
 # Copy JAR file from the quizserver subdirectory target folder
 COPY --from=build /build/quizserver/target/quizserver-0.0.1-SNAPSHOT.jar /app/app.jar
 
+# Copy startup script
+COPY --from=build /build/start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Expose port
 EXPOSE 8080
 
-# Run the application
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
+# Run the application using startup script
+CMD ["/app/start.sh"]
