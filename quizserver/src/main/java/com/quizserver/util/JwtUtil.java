@@ -52,10 +52,37 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
+    public String generateToken(String username, String role, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
+        claims.put("userId", userId);
+        return createToken(claims, username);
+    }
+    
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         return createToken(claims, username);
+    }
+    
+    public String extractUsername(String token) {
+        return getUsernameFromToken(token);
+    }
+    
+    public Long extractUserId(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        Object userIdObj = claims.get("userId");
+        if (userIdObj instanceof Integer) {
+            return ((Integer) userIdObj).longValue();
+        } else if (userIdObj instanceof Long) {
+            return (Long) userIdObj;
+        }
+        return null;
+    }
+    
+    public String extractRole(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return (String) claims.get("role");
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
