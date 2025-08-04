@@ -6,28 +6,27 @@
 # Set Spring Profile to production
 export SPRING_PROFILES_ACTIVE=production
 
-# If DATABASE_URL exists, parse it into individual components for Spring Boot
+# Check if DATABASE_URL exists and debug
+echo "DATABASE_URL environment variable: ${DATABASE_URL:-'NOT SET'}"
+printenv | grep -i database || echo "No DATABASE environment variables found"
+
+# If DATABASE_URL exists, use it directly
 if [ -n "$DATABASE_URL" ]; then
-    echo "DATABASE_URL found: $DATABASE_URL"
-    
-    # Render provides DATABASE_URL in format: postgres://user:password@host:port/database
-    # Extract components for Spring Boot
-    export DB_URL="$DATABASE_URL"
-    
-    # Use the full DATABASE_URL directly since Spring Boot can parse it
+    echo "DATABASE_URL found - Spring Boot will auto-configure PostgreSQL"
+    # Let Spring Boot handle DATABASE_URL directly
     export SPRING_DATASOURCE_URL="$DATABASE_URL"
-    export SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"
-    export SPRING_JPA_DATABASE_PLATFORM="org.hibernate.dialect.PostgreSQLDialect"
-    
-    echo "Configured PostgreSQL with DATABASE_URL"
 else
-    echo "No DATABASE_URL found - using fallback configuration"
+    echo "No DATABASE_URL found - using production profile PostgreSQL defaults"
+    # Render should provide DATABASE_URL, but if not, we have defaults in production profile
 fi
 
-# Database configuration will be automatically provided by Render via DATABASE_URL
-# Additional environment variables for explicit configuration
-export DB_DRIVER=org.postgresql.Driver
-export DB_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+# Ensure PostgreSQL driver and dialect are set for production
+export SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+export SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect
+
+echo "Starting application with production profile..."
+echo "Active profile: $SPRING_PROFILES_ACTIVE"
+echo "Port: ${PORT:-10000}"
 
 # Start the application
 java -Dspring.profiles.active=production -Dserver.port=${PORT:-10000} -jar app.jar
