@@ -10,24 +10,40 @@ export SPRING_PROFILES_ACTIVE=production
 echo "DATABASE_URL environment variable: ${DATABASE_URL:-'NOT SET'}"
 printenv | grep -i database || echo "No DATABASE environment variables found"
 
-# If DATABASE_URL exists, convert it to proper JDBC format
+# If DATABASE_URL exists, parse it into components
 if [ -n "$DATABASE_URL" ]; then
-    echo "DATABASE_URL found - converting to JDBC format"
+    echo "DATABASE_URL found - parsing into components"
     
-    # Convert postgres:// to jdbc:postgresql:// if needed
-    if [[ "$DATABASE_URL" == postgres://* ]]; then
-        JDBC_DATABASE_URL="${DATABASE_URL/postgres:/jdbc:postgresql:}"
-        echo "Converted postgres:// to jdbc:postgresql://"
-    elif [[ "$DATABASE_URL" == postgresql://* ]]; then
-        JDBC_DATABASE_URL="jdbc:${DATABASE_URL}"
-        echo "Converted postgresql:// to jdbc:postgresql://"
-    else
-        JDBC_DATABASE_URL="$DATABASE_URL"
-        echo "Using DATABASE_URL as-is"
-    fi
+    # DATABASE_URL format: postgresql://username:password@host:port/database
+    # Extract components using parameter expansion and sed
     
-    export SPRING_DATASOURCE_URL="$JDBC_DATABASE_URL"
-    echo "Set SPRING_DATASOURCE_URL to: $JDBC_DATABASE_URL"
+    # Remove protocol prefix
+    URL_NO_PROTOCOL="${DATABASE_URL#postgresql://}"
+    URL_NO_PROTOCOL="${URL_NO_PROTOCOL#postgres://}"
+    
+    # Extract username and password
+    USER_PASS="${URL_NO_PROTOCOL%%@*}"
+    USERNAME="${USER_PASS%%:*}"
+    PASSWORD="${USER_PASS##*:}"
+    
+    # Extract host, port, and database
+    HOST_PORT_DB="${URL_NO_PROTOCOL##*@}"
+    HOST_PORT="${HOST_PORT_DB%%/*}"
+    DATABASE="${HOST_PORT_DB##*/}"
+    HOST="${HOST_PORT%%:*}"
+    PORT="${HOST_PORT##*:}"
+    
+    # Set environment variables for Spring Boot
+    export SPRING_DATASOURCE_URL="jdbc:postgresql://${HOST}:${PORT}/${DATABASE}"
+    export SPRING_DATASOURCE_USERNAME="${USERNAME}"
+    export SPRING_DATASOURCE_PASSWORD="${PASSWORD}"
+    
+    echo "Parsed DATABASE_URL into:"
+    echo "  Host: $HOST"
+    echo "  Port: $PORT"
+    echo "  Database: $DATABASE"
+    echo "  Username: $USERNAME"
+    echo "  JDBC URL: jdbc:postgresql://${HOST}:${PORT}/${DATABASE}"
 else
     echo "No DATABASE_URL found - using production profile PostgreSQL defaults"
 fi
